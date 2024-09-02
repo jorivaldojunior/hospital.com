@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agendamento - Hospital Guararapes</title>
+    
+    <!-- Ícone do Aplicativo -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Link para a Biblioteca de Ícones -->
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-brands/css/uicons-brands.css">
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-straight/css/uicons-regular-straight.css">
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'custom-green': '#22C55E',
+                        'custom-blue': '#1D4ED8',
+                        'custom-blue-hover': '#1E40AF',
+                        'custom-gray': '#F3F4F6',
+                        'custom-dark-gray': '#374151',
+                        'custom-light-gray': '#D1D5DB',
+                        'custom-green-hover': '#16A34A',
+                        'soft-green': '#e0f7e9',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Arial', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        /* Ajustes para Header e Footer */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            scroll-behavior: smooth;
+        }
+        
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .content {
+            flex: 1;
+            padding-top: 100px;
+            padding-bottom: 60px;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: #1D4ED8;
+            transition: right 0.3s ease-in-out;
+            z-index: 1100;
+        }
+
+        .mobile-menu.show {
+            right: 0;
+        }
+
+        .mobile-menu-icon {
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            .mobile-menu-icon {
+                display: block;
+            }
+            #navMenu {
+                display: none;
+            }
+        }
+
+        /* Responsividade para telas menores que 400px */
+        @media (max-width: 400px) {
+            .max-w-lg {
+                max-width: 90%;
+            }
+            .text-3xl {
+                font-size: 1.75rem;
+            }
+            .text-2xl {
+                font-size: 1.5rem;
+            }
+            .py-8 {
+                padding-top: 1.5rem;
+                padding-bottom: 1.5rem;
+            }
+            .px-4, .px-5, .px-6 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .py-3, .py-4, .py-5 {
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
+            .rounded-lg {
+                border-radius: 0.5rem;
+            }
+            .text-sm {
+                font-size: 0.875rem;
+            }
+            .text-base {
+                font-size: 1rem;
+            }
+            .space-y-6 > * + * {
+                margin-top: 1.5rem;
+            }
+            .modal-content {
+                padding: 1rem;
+            }
+        }
+
+        .hidden { display: none; }
+
+        /* Estilo do Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        /* Estilo para campos obrigatórios não preenchidos */
+        .border-red-500 {
+            border-color: #F56565;
+        }
+    </style>
+</head>
+
+<body class="bg-custom-gray">
+
+    <!-- Cabeçalho -->
+    <header class="bg-custom-green p-6 w-full flex justify-between items-center">
+        <!-- Logo no lado esquerdo -->
+        <img src="./image/logo2.jpg" alt="logo" class="w-36 h-auto md:w-48">
+
+        <!-- Ícone do Menu Hambúrguer para dispositivos móveis -->
+        <button id="menuToggle" class="mobile-menu-icon text-white text-3xl focus:outline-none">
+            <i class="fi fi-rr-menu-burger"></i>
+        </button>
+
+        <!-- Menu de navegação para desktop -->
+        <nav id="navMenu" class="hidden md:flex space-x-6">
+            <a href="index.html" class="text-white hover:text-custom-blue-hover transition duration-200">
+                Home
+            </a>
+            <a href="https://www.instagram.com/guararapeshospital" target="_blank" class="text-white hover:text-custom-blue-hover transition duration-200">
+                <i class="fi fi-brands-instagram text-2xl"></i>
+            </a>
+            <a href="https://wa.me/5581994045139" target="_blank" class="text-white hover:text-green-600 transition duration-200">
+                <i class="fi fi-brands-whatsapp text-2xl"></i>
+            </a>
+            <a href="https://www.facebook.com/hospitalguararapes/?locale=pt_BR" target="_blank" class="text-white hover:text-custom-blue-hover transition duration-200">
+                <i class="fi fi-brands-facebook text-2xl"></i>
+            </a>
+            <a href="https://hospitalguararapes.org/" target="_blank" class="bg-custom-green text-white py-2 px-4 rounded-lg hover:bg-custom-green-hover transition duration-200 text-sm">
+                Conheça nosso site!
+            </a>
+        </nav>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <div class="content flex flex-col items-center">
+
+        <!-- Menu móvel deslizante -->
+        <div id="mobileMenu" class="mobile-menu flex flex-col items-center justify-center">
+            <button id="closeMenu" class="absolute top-6 right-6 text-white text-3xl">
+                <i class="fi fi-rr-cross"></i>
+            </button>
+            <div class="flex flex-col items-center space-y-8">
+                <a href="index.html" class="text-white hover:text-custom-blue-hover transition duration-200 text-2xl">
+                    Home
+                </a>
+                <a href="https://www.instagram.com/guararapeshospital" target="_blank" class="text-white hover:text-custom-blue-hover transition duration-200">
+                    <i class="fi fi-brands-instagram text-5xl"></i>
+                </a>
+                <a href="https://wa.me/5581994045139" target="_blank" class="text-white hover:text-green-600 transition duration-200">
+                    <i class="fi fi-brands-whatsapp text-5xl"></i>
+                </a>
+                <a href="https://www.facebook.com/hospitalguararapes/?locale=pt_BR" target="_blank" class="text-white hover:text-custom-blue-hover transition duration-200">
+                    <i class="fi fi-brands-facebook text-5xl"></i>
+                </a>
+                <a href="https://hospitalguararapes.org/" target="_blank" class="bg-custom-green text-white py-3 px-6 rounded-lg hover:bg-custom-green-hover transition duration-200 text-lg">
+                    Conheça nosso site...
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div id="paginaCadastro" class="bg-shadow-xl rounded-xl overflow-hidden w-full max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl p-8 mt-10">
+            <h2 class="text-3xl font-bold text-center text-custom-dark-gray mb-8">Cadastro de Paciente</h2>
+            <form id="formCadastro" class="space-y-6">
+                <div>
+                    <label for="nome" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Nome Completo:</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        placeholder="Digite seu nome completo"
+                        required
+                    />
+                </div>
+                <div>
+                    <label for="email" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">E-mail:</label>
+                    <input
+                        type="email"
+                        id="email"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        placeholder="Digite seu e-mail"
+                        required
+                    />
+                </div>
+                <div>
+                    <label for="telefone" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Telefone:</label>
+                    <input
+                        type="tel"
+                        id="telefone"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        placeholder="Digite seu telefone"
+                        required
+                    />
+                </div>
+                <div>
+                    <label for="endereco" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Endereço:</label>
+                    <input
+                        type="text"
+                        id="endereco"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        placeholder="Digite seu endereço"
+                    />
+                </div>
+                <button type="button" onclick="salvarCadastro()" class="w-full bg-custom-blue text-white py-3 px-4 rounded-lg hover:bg-custom-blue-hover transition duration-200">
+                    Avançar
+                </button>
+            </form>
+        </div>
+
+        <!-- Página de Agendamento -->
+        <div id="paginaAgendamento" class="hidden bg-shadow-xl rounded-xl overflow-hidden w-full max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl p-8 mt-10">
+            <h2 id="bemVindo" class="text-3xl font-bold text-center text-custom-dark-gray mb-8"></h2>
+            <form id="formAgendamento" class="space-y-6">
+                <div>
+                    <label for="especialidade" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Nossos Serviços:</label>
+                    <select
+                        id="especialidade"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        required
+                    >
+                        <option value="" disabled selected>Selecione a especialidade</option>
+                        <option value="maternidade">Maternidade</option>
+                        <option value="urgencia">Urgência</option>
+                        <option value="consultorios_especializados">Consultórios Especializados</option>
+                        <option value="cirurgias">Cirurgias</option>
+                        <option value="planos_saude">Planos de Saúde</option>
+                        <option value="exames">Exames</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="exame" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Tipo de Exame:</label>
+                    <select
+                        id="exame"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        required
+                    >
+                        <option value="" disabled selected>Selecione o tipo de exame</option>
+                        <option value="diagnostico">Exame de Diagnóstico</option>
+                        <option value="imagem">Exame de Imagem</option>
+                        <option value="outros serviços">Outros Serviços</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="especialidadeMedica" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Especialidade Médica:</label>
+                    <select
+                        id="especialidadeMedica"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        required
+                    >
+                        <option value="" disabled selected>Selecione a especialidade médica</option>
+                        <option value="cardiologia">Cardiologia</option>
+                        <option value="dermatologia">Dermatologia</option>
+                        <option value="dentista">Dentista</option>
+                        <option value="ginecologia">Ginecologia</option>
+                        <option value="neurologia">Neurologia</option>
+                        <option value="ortopedia">Ortopedia</option>
+                        <option value="obstetrícia">Obstetrícia</option>
+                        <option value="pediatria">Pediatria</option>
+                        <option value="urologia">Urologia</option>
+                        <option value="oftalmologia">Oftalmologia</option>
+                        <option value="endocrinologia">Endocrinologia</option>
+                        <option value="psiquiatria">Psiquiatria</option>
+                        <!-- Adicione outras especialidades médicas conforme necessário -->
+                    </select>
+                </div>
+                <div>
+                    <label for="data" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Data Pretendida:</label>
+                    <input
+                        type="date"
+                        id="data"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        required
+                    />
+                </div>
+                <div>
+                    <label for="hora" class="block text-gray-700 text-sm md:text-base font-semibold mb-2">Hora Pretendida:</label>
+                    <input
+                        type="time"
+                        id="hora"
+                        class="w-full px-4 py-3 md:px-5 md:py-4 border border-custom-light-gray rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-blue"
+                        required
+                    />
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" onclick="mostrarModalAgendamento()" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-200">
+                        Visualizar Agendamento
+                    </button>
+                    <button type="button" onclick="voltarPaginaInicial()" class="bg-custom-blue text-white py-3 px-4 rounded-lg hover:bg-custom-blue-hover transition duration-200">
+                        Voltar à Página Inicial
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Modal de Visualização de Agendamento -->
+        <div id="modalAgendamento" class="modal hidden">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4">Detalhes do Agendamento</h3>
+                <p id="modalEspecialidade" class="mb-2"></p>
+                <p id="modalExame" class="mb-2"></p>
+                <p id="modalEspecialidadeMedica" class="mb-2"></p>
+                <p id="modalData" class="mb-2"></p>
+                <p id="modalHora" class="mb-4"></p>
+                <div class="flex justify-between">
+                    <button onclick="enviarWhatsApp()" class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-200">
+                        Enviar para WhatsApp
+                    </button>
+                    <button onclick="fecharModal()" class="bg-custom-blue text-white py-2 px-4 rounded-lg hover:bg-custom-blue-hover transition duration-200">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <script>
+        function salvarCadastro() {
+            const nomeCompleto = document.getElementById('nome').value;
+            const primeiroNome = nomeCompleto.split(' ')[0]; // Obtém o primeiro nome
+            const email = document.getElementById('email').value;
+            const telefone = document.getElementById('telefone').value;
+            const endereco = document.getElementById('endereco').value;
+
+            if (primeiroNome) {
+                // Armazena os dados no localStorage
+                localStorage.setItem('nomeCompleto', nomeCompleto);
+                localStorage.setItem('email', email);
+                localStorage.setItem('telefone', telefone);
+                localStorage.setItem('endereco', endereco);
+
+                document.getElementById('bemVindo').innerText = `Olá, ${primeiroNome}!`;
+                mostrarPagina('paginaAgendamento');
+                window.scrollTo(0, 0);  // Garante que a página comece no topo
+            } else {
+                alert("Por favor, preencha o nome.");
+            }
+        }
+
+        function mostrarPagina(pagina) {
+            document.getElementById('paginaCadastro').classList.add('hidden');
+            document.getElementById('paginaAgendamento').classList.add('hidden');
+            document.getElementById(pagina).classList.remove('hidden');
+        }
+
+        function voltarPaginaInicial() {
+            mostrarPagina('paginaCadastro');
+            document.getElementById('formCadastro').reset();
+            document.getElementById('formAgendamento').reset();
+            localStorage.clear(); // Limpa os dados ao voltar para a página inicial
+        }
+
+        function mostrarModalAgendamento() {
+            // Coletar os dados do agendamento
+            const especialidade = document.getElementById('especialidade').value;
+            const exame = document.getElementById('exame').value;
+            const especialidadeMedica = document.getElementById('especialidadeMedica').value;
+            const data = document.getElementById('data').value;
+            const hora = document.getElementById('hora').value;
+
+            // Exibir os dados no modal
+            document.getElementById('modalEspecialidade').innerText = `Especialidade: ${especialidade}`;
+            document.getElementById('modalExame').innerText = `Tipo de Exame: ${exame}`;
+            document.getElementById('modalEspecialidadeMedica').innerText = `Especialidade Médica: ${especialidadeMedica}`;
+            document.getElementById('modalData').innerText = `Data Pretendida: ${data}`;
+            document.getElementById('modalHora').innerText = `Horário Pretendida: ${hora}`;
+
+            // Mostrar o modal
+            document.getElementById('modalAgendamento').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalAgendamento').classList.add('hidden');
+        }
+
+        function validarCampo(campoId) {
+            const campo = document.getElementById(campoId);
+            if (campo.value.trim() === '') {
+                campo.classList.add('border-red-500'); // Destacar o campo com borda vermelha
+                return false;
+            } else {
+                campo.classList.remove('border-red-500'); // Remover a borda vermelha se preenchido
+                return true;
+            }
+        }
+
+        function enviarWhatsApp() {
+            // Valida cada campo individualmente
+            const camposValidos = [
+                validarCampo('especialidade'),
+                validarCampo('exame'),
+                validarCampo('especialidadeMedica'),
+                validarCampo('data'),
+                validarCampo('hora')
+            ];
+
+            // Se todos os campos forem válidos (nenhum falso no array)
+            if (camposValidos.every(Boolean)) {
+                // Coletar os dados do cadastro
+                const nomeCompleto = localStorage.getItem('nomeCompleto');
+                const email = localStorage.getItem('email');
+                const telefone = localStorage.getItem('telefone');
+                const endereco = localStorage.getItem('endereco');
+
+                // Coletar os dados do agendamento
+                const especialidade = document.getElementById('especialidade').value;
+                const exame = document.getElementById('exame').value;
+                const especialidadeMedica = document.getElementById('especialidadeMedica').value;
+                const data = document.getElementById('data').value;
+                const hora = document.getElementById('hora').value;
+
+                const mensagem = `Olá, meu nome é ${nomeCompleto}. Estou abrindo um registro de agendamento online com o Hospital Guararapes com os seguintes detalhes:\n\n` +
+                                `Especialidade: ${especialidade}\n` +
+                                `Tipo de Exame: ${exame}\n` +
+                                `Especialidade Médica: ${especialidadeMedica}\n` +
+                                `Verifique a disponibilidade desta data: ${data}\n` +
+                                `E a disponibilidade deste horário: ${hora}\n\n` +
+                                `Dados do Paciente:\n` +
+                                `Nome: ${nomeCompleto}\n` +
+                                `E-mail: ${email}\n` +
+                                `Telefone: ${telefone}\n` +
+                                `Endereço: ${endereco}`;
+
+                const numeroWhatsapp = "5581991152307";
+                const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensagem)}`;
+
+                window.open(url, '_blank');
+            }
+        }
+
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('mobileMenu').classList.toggle('show');
+        });
+
+        document.getElementById('closeMenu').addEventListener('click', function() {
+            document.getElementById('mobileMenu').classList.remove('show');
+        });
+    </script>
+</body>
+</html>
